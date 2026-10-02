@@ -1,55 +1,72 @@
-# Lab 02 – Sysmon Integration with Wazuh
+# Lab 02 – Sysmon Integration and First Detection Investigation
 
 ## Objective
 
-The purpose of this lab was to improve endpoint visibility by installing Microsoft Sysmon on the Windows host and forwarding Sysmon events into Wazuh.
+Improve Windows endpoint visibility by installing Microsoft Sysmon, forwarding Sysmon telemetry to Wazuh, and investigating a detected endpoint event.
 
-The goal was to collect detailed endpoint telemetry such as process creation, file creation, registry activity, network connections, and DNS queries for SOC investigation.
-
-## Lab Environment
+## Environment
 
 - Windows 11 endpoint
 - Wazuh SIEM
-- Wazuh Windows Agent
+- Wazuh Windows agent
 - Microsoft Sysmon
 - PowerShell
 - Windows Event Viewer
 - Oracle VirtualBox
 
-## Tools Used
+## Why Sysmon?
 
-- Wazuh
-- Sysmon
-- Windows Event Viewer
-- PowerShell
-- Oracle VirtualBox
-
-## What is Sysmon?
-
-Sysmon is a Microsoft Sysinternals tool that records detailed Windows system activity.
-
-Examples of telemetry Sysmon can collect include:
-
-- Process creation
-- Network connections
-- File creation
-- Registry changes
-- DNS queries
-- Process hashes
-
-This additional telemetry gives a SOC analyst more visibility than standard Windows logging alone.
+Sysmon provides detailed endpoint telemetry that can help analysts investigate process execution, file creation, network connections, registry activity, DNS activity, hashes, and other security-relevant behavior.
 
 ## Tasks Completed
 
-### 1. Downloaded Sysmon
+1. Downloaded Sysmon from Microsoft Sysinternals.
+2. Installed Sysmon using a configuration file.
+3. Verified the `Sysmon64` service was running.
+4. Added the Sysmon Operational channel to the Wazuh agent configuration.
+5. Restarted the Wazuh agent.
+6. Confirmed Sysmon telemetry appeared in Wazuh Threat Hunting.
+7. Opened a detected event and reviewed the surrounding documents and Wazuh rule details.
 
-Sysmon was downloaded from the official Microsoft Sysinternals website.
+## Wazuh Collection Configuration
 
-The files were extracted to the SOC lab directory.
+```xml
+<localfile>
+  <location>Microsoft-Windows-Sysmon/Operational</location>
+  <log_format>eventchannel</log_format>
+</localfile>
+```
 
-Example files included:
+## Investigation Example
 
-```text
-Sysmon.exe
-Sysmon64.exe
-Sysmon64a.exe
+One investigated Wazuh event matched:
+
+- **Rule ID:** 92205
+- **Rule level:** 9
+- **MITRE ATT&CK mapping:** T1105 – Ingress Tool Transfer
+
+The MITRE mapping was treated as context rather than proof that malicious activity occurred. The analyst still needs to review the process, command line, user, host, file path, source, and surrounding events.
+
+## Analyst Workflow Practiced
+
+1. Identify what happened.
+2. Review when and where it occurred.
+3. Identify the user, process, or file involved.
+4. Review the Wazuh rule and severity.
+5. Review MITRE ATT&CK context.
+6. Inspect surrounding events.
+7. Classify the activity based on evidence.
+
+## Evidence
+
+See the [Screenshots](./Screenshots) folder for Sysmon installation, Wazuh configuration, alert investigation, timeline, and rule details.
+
+## Skills Practiced
+
+- Sysmon deployment
+- Endpoint telemetry collection
+- Wazuh Threat Hunting
+- Process and file-event investigation
+- MITRE ATT&CK interpretation
+- Alert triage
+- Timeline analysis
