@@ -1,28 +1,41 @@
 # Lab 04 – Failed Login Detection and Investigation with Wazuh
 
 ## Objective
+Practice investigating failed Windows authentication events with Wazuh and Windows Security logs.
 
-The purpose of this lab was to generate intentional failed Windows login attempts, verify that Windows recorded the activity, and investigate the resulting authentication alerts in Wazuh.
-
-The goal was to practice SOC triage and learn how to read failed-login events using Windows Security logs and Wazuh Threat Hunting.
-
-## Lab Environment
-
+## Environment
 - Windows 11 endpoint
 - Wazuh SIEM
-- Wazuh Windows Agent
+- Wazuh Windows agent
 - PowerShell
 - Windows Security Event Logs
-- Oracle VirtualBox
 
-## Tools Used
+## Key Event
+**Event ID 4625** indicates that an account failed to log on.
 
-- Wazuh
-- PowerShell
-- Windows Event Viewer
-- Windows Security Auditing
+## Investigation Findings
+- Endpoint: Windows-Host
+- Event ID: 4625
+- Logon Type: 2
+- Source address: 127.0.0.1
+- Status: 0xC000006D
+- Substatus: 0xC000006A
+- Wazuh Rule ID: 60122
+- Wazuh Rule Level: 5
+- Rule description: Logon Failure - Unknown user or bad password
 
-## Key Event ID
+## Analysis
+Logon Type 2 represents an interactive local logon. The loopback source address supports that the activity originated from the same endpoint. The status and substatus values indicate a failed authentication caused by an incorrect password.
 
-```text
-4625
+A single failed login can be normal. Repeated failures can be more significant when combined with unusual source addresses, multiple accounts, rapid repetition, account lockout, or other suspicious activity.
+
+## Classification
+**Benign / Authorized Security Testing**
+
+## Skills Practiced
+- Windows authentication analysis
+- Event ID 4625 investigation
+- Wazuh alert triage
+- Logon type interpretation
+- Event correlation
+- Incident documentation
